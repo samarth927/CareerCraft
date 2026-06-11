@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerCraft AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#07070f;--bg2:#0f0f1a;--bg3:#161625;--bg4:#1e1e30;--bg5:#26263a;
+--border:#ffffff0d;--border2:#ffffff18;--border3:#ffffff28;
+--text:#eeeef8;--text2:#9090b0;--text3:#505070;
+--accent:#6366f1;--accent2:#8b5cf6;--accent3:#06b6d4;
+--gold:#f59e0b;--green:#10b981;--red:#ef4444;--pink:#ec4899;
+--radius:12px;--radius2:18px;
+--glow:0 0 30px rgba(99,102,241,0.12);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+h1,h2,h3{font-family:'Syne',sans-serif}
+
+/* ── Layout ── */
+.app{display:flex;min-height:100vh}
+.sidebar{width:236px;background:var(--bg2);border-right:1px solid var(--border2);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100}
+.main{margin-left:236px;flex:1}
+
+/* ── Sidebar ── */
+.logo{padding:22px 18px 14px;border-bottom:1px solid var(--border2)}
+.logo-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.logo-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,#a5b4fc,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sub{font-size:10.5px;color:var(--text3);margin-top:1px;letter-spacing:.3px}
+.nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:3px;overflow-y:auto}
+.nav-section{font-size:9.5px;color:var(--text3);padding:10px 10px 4px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all .18s;border:1px solid transparent;background:none;text-align:left;width:100%}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:linear-gradient(135deg,#6366f114,#06b6d410);color:#a5b4fc;border-color:#6366f122}
+.nav-item i{font-size:15px;width:18px;flex-shrink:0;opacity:.8}
+.nav-item.active i{opacity:1}
+.sidebar-bottom{padding:14px;border-top:1px solid var(--border2)}
+.profile-mini{display:flex;align-items:center;gap:9px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;border:2px solid #6366f140}
+.p-name{font-size:12.5px;font-weight:600;color:var(--text)}
+.p-role{font-size:10.5px;color:var(--text3)}
+
+/* ── Pages ── */
+.page{display:none;padding:28px 32px;animation:fadeUp .3s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.page-header{margin-bottom:24px}
+.page-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.4px}
+.page-sub{color:var(--text2);font-size:13px;margin-top:3px}
+.badge-title{display:inline-block;background:linear-gradient(135deg,#6366f120,#06b6d415);border:1px solid #6366f130;color:#a5b4fc;font-size:10px;padding:2px 10px;border-radius:20px;font-weight:600;letter-spacing:.5px;margin-bottom:6px}
+
+/* ── Cards ── */
+.card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius2);padding:20px}
+.card-inner{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+
+/* ── Metric cards ── */
+.metric{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:15px 16px;position:relative;overflow:hidden}
+.metric::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+.metric.m1::after{background:linear-gradient(90deg,#6366f1,#8b5cf6)}
+.metric.m2::after{background:linear-gradient(90deg,#06b6d4,#0891b2)}
+.metric.m3::after{background:linear-gradient(90deg,#10b981,#059669)}
+.metric.m4::after{background:linear-gradient(90deg,#f59e0b,#d97706)}
+.metric.m5::after{background:linear-gradient(90deg,#ec4899,#db2777)}
+.metric-label{font-size:10.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;font-weight:600}
+.metric-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1}
+.metric-bar{height:3px;background:var(--bg5);border-radius:2px;margin-top:10px;overflow:hidden}
+.metric-fill{height:100%;border-radius:2px}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:600}
+.b-purple{background:#6366f118;color:#a5b4fc;border:1px solid #6366f128}
+.b-cyan{background:#06b6d418;color:#67e8f9;border:1px solid #06b6d428}
+.b-green{background:#10b98118;color:#6ee7b7;border:1px solid #10b98128}
+.b-red{background:#ef444418;color:#fca5a5;border:1px solid #ef444428}
+.b-gold{background:#f59e0b18;color:#fcd34d;border:1px solid #f59e0b28}
+.b-pink{background:#ec489918;color:#f9a8d4;border:1px solid #ec489928}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;box-shadow:0 4px 16px #6366f128}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 20px #6366f138}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+
+/* ── Form ── */
+.fg{margin-bottom:14px}
+.fl{font-size:11.5px;font-weight:600;color:var(--text2);margin-bottom:5px;display:block;letter-spacing:.2px}
+.fi{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:9px 13px;border-radius:9px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border .2s}
+.fi:focus{border-color:#6366f150;background:var(--bg4)}
+.fi::placeholder{color:var(--text3)}
+select.fi option{background:var(--bg3);color:var(--text)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── Tags ── */
+.tag-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.tag{background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:4px 11px;border-radius:7px;font-size:11.5px;font-weight:500;cursor:pointer;transition:all .18s;user-select:none}
+.tag:hover{border-color:#6366f140;color:var(--text)}
+.tag.sel{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border-color:transparent}
+
+/* ── Step indicator ── */
+.steps{display:flex;align-items:center;margin-bottom:28px}
+.sdot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text3);transition:all .3s;flex-shrink:0}
+.sdot.done{background:#6366f1;border-color:#6366f1;color:white}
+.sdot.active{background:var(--bg3);border-color:#6366f1;color:#a5b4fc;box-shadow:0 0 0 3px #6366f118}
+.sline{flex:1;height:1px;background:var(--border2)}
+.sline.done{background:linear-gradient(90deg,#6366f1,#8b5cf640)}
+
+/* ── Onboard card ── */
+.ob-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius2);padding:26px;box-shadow:var(--glow)}
+.ob-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:3px}
+.ob-sub{font-size:12.5px;color:var(--text2);margin-bottom:22px}
+.section-divider{height:1px;background:var(--border);margin:18px 0}
+.sub-section{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-weight:700;margin-bottom:10px}
+
+/* ── DNA ── */
+.dna-hero{background:linear-gradient(135deg,#0d0d20,#0a1528,#0d1a1a);border:1px solid #6366f128;border-radius:var(--radius2);padding:22px;position:relative;overflow:hidden;margin-bottom:18px}
+.dna-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;background:radial-gradient(circle,#6366f112 0%,transparent 65%)}
+.dna-hero::after{content:'';position:absolute;bottom:-40px;left:40px;width:180px;height:180px;background:radial-gradient(circle,#06b6d408 0%,transparent 65%)}
+.dna-eyebrow{font-size:10px;color:#a5b4fc;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:5px}
+.dna-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:3px}
+.dna-sub{color:var(--text2);font-size:13px}
+
+/* ── Progress ── */
+.prog-item{margin-bottom:11px}
+.prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.prog-label{font-size:12.5px;font-weight:500}
+.prog-pct{font-size:11.5px;color:var(--text2);font-weight:600}
+.prog-bar{height:6px;background:var(--bg5);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
+
+/* ── Career cards ── */
+.cc{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;margin-bottom:8px}
+.cc:hover{border-color:#6366f138;background:var(--bg4);transform:translateX(2px)}
+.cc.top{border-color:#6366f145;background:linear-gradient(135deg,#6366f10a,var(--bg3))}
+.cc-rank{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--bg5);position:absolute;top:8px;right:12px}
+.cc-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.cc-score{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* ── Timeline ── */
+.tl{position:relative;padding-left:22px}
+.tl::before{content:'';position:absolute;left:7px;top:4px;bottom:4px;width:1.5px;background:linear-gradient(to bottom,#6366f1,#06b6d420)}
+.tl-item{position:relative;margin-bottom:18px;padding-left:10px}
+.tl-dot{position:absolute;left:-19px;top:3px;width:11px;height:11px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:2px solid var(--bg)}
+.tl-year{font-family:'Syne',sans-serif;font-size:10.5px;font-weight:700;color:#a5b4fc;margin-bottom:2px}
+.tl-title{font-size:13px;font-weight:500;margin-bottom:1px}
+.tl-desc{font-size:11.5px;color:var(--text2)}
+
+/* ── Simulator ── */
+.sim-hero{background:linear-gradient(135deg,#0a0a18,#0a1428,#080f18);border:1px solid #06b6d420;border-radius:var(--radius2);padding:24px;text-align:center;margin-bottom:22px;position:relative;overflow:hidden}
+.sim-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,#6366f10e,transparent 60%)}
+.sim-track{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:20px}
+.sn{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;text-align:center;cursor:pointer;transition:all .25s}
+.sn:hover{border-color:#6366f138}
+.sn.reached{background:linear-gradient(135deg,#6366f10e,#06b6d408);border-color:#6366f130}
+.sn.current{border-color:#6366f1;box-shadow:0 0 0 2px #6366f120,0 0 20px #6366f115}
+.sn-year{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#a5b4fc;margin-bottom:3px}
+.sn-label{font-size:9.5px;color:var(--text2);line-height:1.3}
+.sn-sal{font-size:9.5px;font-weight:700;color:#10b981;margin-top:3px}
+.sc-card{background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius);padding:12px;cursor:pointer;transition:all .2s}
+.sc-card:hover{border-color:#06b6d435}
+.sc-card.active{border-color:#06b6d4;background:linear-gradient(135deg,#06b6d40c,var(--bg3))}
+.sc-title{font-size:12.5px;font-weight:600;margin-bottom:3px}
+.sc-impact{font-size:11px;color:#10b981;font-weight:500}
+
+/* ── Placement ── */
+.big-score{font-family:'Syne',sans-serif;font-size:76px;font-weight:800;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.co-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:11px 14px;display:flex;align-items:center;gap:11px;margin-bottom:7px}
+.co-logo{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.co-name{font-size:13px;font-weight:600}
+.co-type{font-size:10.5px;color:var(--text2)}
+.co-pct{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-left:auto}
+
+/* ── Action items ── */
+.ai-item{display:flex;align-items:flex-start;gap:11px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:7px;transition:border .2s}
+.ai-item:hover{border-color:var(--border2)}
+.ai-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.ai-icon.h{background:#ef444418;color:#fca5a5}
+.ai-icon.m{background:#f59e0b18;color:#fcd34d}
+.ai-icon.l{background:#10b98118;color:#6ee7b7}
+.ai-title{font-size:13px;font-weight:500;margin-bottom:1px}
+.ai-desc{font-size:11.5px;color:var(--text2)}
+.pri{font-size:9.5px;padding:2px 8px;border-radius:20px;font-weight:700;margin-left:auto;align-self:flex-start;flex-shrink:0}
+.pri.h{background:#ef444415;color:#fca5a5}
+.pri.m{background:#f59e0b15;color:#fcd34d}
+.pri.l{background:#10b98115;color:#6ee7b7}
+
+/* ── AI Bubble ── */
+.ai-msg{background:linear-gradient(135deg,#0d0d22,#0a1428);border:1px solid #6366f125;border-radius:var(--radius);padding:14px 16px;position:relative;margin-top:18px}
+.ai-msg::before{content:'✦ AI';position:absolute;top:-9px;left:14px;background:var(--bg);padding:0 6px;font-size:10px;color:#a5b4fc;font-weight:700;letter-spacing:.5px}
+.ai-msg p{font-size:13px;line-height:1.75;color:var(--text2)}
+.ai-msg strong{color:var(--text)}
+
+/* ── Academic strip ── */
+.acad-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.acad-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 14px;text-align:center}
+.acad-box-label{font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:4px}
+.acad-box-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+
+/* ── Roadmap ── */
+.rm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rm-item{background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:11px}
+.rm-mo{font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:3px}
+.rm-task{font-size:12px;font-weight:600}
+.rm-det{font-size:10.5px;color:var(--text2);margin-top:2px}
+
+/* ── Dividers & helpers ── */
+.glow-divider{height:1px;background:linear-gradient(90deg,transparent,#6366f135,#06b6d430,transparent);margin:20px 0}
+.row{display:flex;align-items:center;gap:10px}
+.between{display:flex;justify-content:space-between;align-items:center}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.sec-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-weight:700;margin-bottom:10px}
+.t-sm{font-size:12px}.t-xs{font-size:11px}.t2{color:var(--text2)}.t3{color:var(--text3)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:700px){.sidebar{display:none}.main{margin-left:0}.grid4,.grid5{grid-template-columns:1fr 1fr}.sim-track{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-brain" style="color:white;font-size:18px"></i></div>
+    <div class="logo-text">CareerCraft AI</div>
+    <div class="logo-sub">Your Personal AI Mentor</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Platform</div>
+    <button class="nav-item active" onclick="showPage('onboard')"><i class="ti ti-user-plus"></i>Student Profile</button>
+    <button class="nav-item" onclick="showPage('dna')"><i class="ti ti-dna"></i>My DNA</button>
+    <button class="nav-item" onclick="showPage('career')"><i class="ti ti-compass"></i>Career Navigator</button>
+    <button class="nav-item" onclick="showPage('simulator')"><i class="ti ti-rocket"></i>Future Simulator</button>
+    <button class="nav-item" onclick="showPage('placement')"><i class="ti ti-chart-bar"></i>Placement Analyzer</button>
+    <button class="nav-item" onclick="showPage('plan')"><i class="ti ti-checklist"></i>Action Plan</button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="profile-mini">
+      <div class="avatar" id="sb-av">?</div>
+      <div><div class="p-name" id="sb-name">Not set up yet</div><div class="p-role" id="sb-role">Complete profile →</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main">
+
+<!-- ONBOARD -->
+<div class="page active" id="page-onboard">
+<div style="max-width:660px;margin:0 auto">
+  <div class="page-header">
+    <div class="badge-title">STEP-BY-STEP SETUP</div>
+    <div class="page-title">Create Your Student Profile</div>
+    <div class="page-sub">Fill in your details — the AI will analyse everything and build your unique Student DNA</div>
+  </div>
+  <div class="steps" id="step-ind"></div>
+  <div id="ob-body"></div>
+</div>
+</div>
+
+<!-- DNA -->
+<div class="page" id="page-dna">
+  <div class="page-header"><div class="badge-title">AI GENERATED</div><div class="page-title">My Student DNA</div><div class="page-sub">Dynamic profile that evolves as you grow</div></div>
+  <div id="dna-body"></div>
+</div>
+
+<!-- CAREER -->
+<div class="page" id="page-career">
+  <div class="page-header"><div class="badge-title">AI CAREER COUNSELOR</div><div class="page-title">Career Navigator</div><div class="page-sub">Top career matches based on your complete profile</div></div>
+  <div id="career-body"></div>
+</div>
+
+<!-- SIMULATOR -->
+<div class="page" id="page-simulator">
+  <div class="page-header"><div class="badge-title">WOW FEATURE ✦</div><div class="page-title">Future Simulator</div><div class="page-sub">Visualize your next 7 years — interactive what-if engine</div></div>
+  <div id="sim-body"></div>
+</div>
+
+<!-- PLACEMENT -->
+<div class="page" id="page-placement">
+  <div class="page-header"><div class="badge-title">READINESS ENGINE</div><div class="page-title">Placement Readiness Analyzer</div><div class="page-sub">How close are you to landing your dream job?</div></div>
+  <div id="place-body"></div>
+</div>
+
+<!-- PLAN -->
+<div class="page" id="page-plan">
+  <div class="page-header"><div class="badge-title">PERSONALIZED ROADMAP</div><div class="page-title">AI Action Plan</div><div class="page-sub">Your 90-day sprint to placement success</div></div>
+  <div id="plan-body"></div>
+</div>
+
+</main>
+</div>
+
+<script>
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+const S = {
+  step: 0,
+  p: {
+    name:'', age:'', year:'', branch:'', cgpa:'',
+    marks10:'', board10:'', marks12:'', board12:'', stream12:'',
+    skills:[], interests:[], subjects:[],
+    budget:'', dream:'', industry:'', projects:'', certifications:'', internships:''
+  }
+};
+
+const STEPS = [
+  {
+    title:'Basic Information',
+    sub:'Personal details to get started',
+    content: `
+    <div class="form-row">
+      <div class="fg"><label class="fl">Full Name *</label><input class="fi" id="f-name" placeholder="e.g. Arjun Sharma"></div>
+      <div class="fg"><label class="fl">Age</label><input class="fi" type="number" id="f-age" placeholder="e.g. 20"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label class="fl">Current Year / Class *</label>
+        <select class="fi" id="f-year"><option value="">Select year...</option>
+        ${['1st Year','2nd Year','3rd Year','4th Year','Final Year','Fresher (Graduated)'].map(o=>`<option>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Branch / Stream *</label>
+        <select class="fi" id="f-branch"><option value="">Select branch...</option>
+        ${['Computer Science (CS)','Information Technology (IT)','Electronics & Communication (ECE)','Electrical Engineering (EE)','Mechanical Engineering (ME)','Civil Engineering (CE)','Data Science','AI & Machine Learning','BCA','MCA','BSc Computer Science'].map(o=>`<option>${o}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label class="fl">College/University</label><input class="fi" id="f-college" placeholder="e.g. VIT Vellore, BITS Pilani"></div>
+      <div class="fg"><label class="fl">City / Location</label><input class="fi" id="f-city" placeholder="e.g. Bengaluru, Pune"></div>
+    </div>`
+  },
+  {
+    title:'Academic Performance',
+    sub:'Your complete academic background including 10th, 12th and college scores',
+    content: `
+    <div class="section-divider"></div>
+    <div class="sub-section">🎓 10th Standard (Secondary)</div>
+    <div class="form-row3">
+      <div class="fg"><label class="fl">10th Marks / CGPA *</label><input class="fi" id="f-marks10" placeholder="e.g. 92% or 9.2 CGPA"></div>
+      <div class="fg"><label class="fl">Board</label>
+        <select class="fi" id="f-board10"><option value="">Select...</option>
+        ${['CBSE','ICSE','State Board (UP)','State Board (MH)','State Board (TN)','State Board (KA)','State Board (AP)','State Board (RJ)','Other'].map(o=>`<option>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Year of Passing</label><input class="fi" id="f-year10" placeholder="e.g. 2020"></div>
+    </div>
+    <div class="section-divider"></div>
+    <div class="sub-section">🎓 12th Standard (Higher Secondary / Intermediate)</div>
+    <div class="form-row3">
+      <div class="fg"><label class="fl">12th Marks / CGPA *</label><input class="fi" id="f-marks12" placeholder="e.g. 88% or 8.8 CGPA"></div>
+      <div class="fg"><label class="fl">Board</label>
+        <select class="fi" id="f-board12"><option value="">Select...</option>
+        ${['CBSE','ICSE','State Board (UP)','State Board (MH)','State Board (TN)','State Board (KA)','State Board (AP)','State Board (RJ)','Other'].map(o=>`<option>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Stream</label>
+        <select class="fi" id="f-stream12"><option value="">Select...</option>
+        ${['Science (PCM)','Science (PCB)','Science (PCMB)','Commerce','Arts / Humanities'].map(o=>`<option>${o}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="section-divider"></div>
+    <div class="sub-section">🏫 College / University</div>
+    <div class="form-row3">
+      <div class="fg"><label class="fl">Current CGPA / % *</label><input class="fi" id="f-cgpa" placeholder="e.g. 8.2 CGPA or 78%"></div>
+      <div class="fg"><label class="fl">Current Semester</label>
+        <select class="fi" id="f-sem"><option value="">Select...</option>
+        ${['Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6','Sem 7','Sem 8','Graduated'].map(o=>`<option>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Active Backlogs</label>
+        <select class="fi" id="f-backlog"><option value="">Select...</option>
+        ${['None','1 backlog','2 backlogs','3+ backlogs'].map(o=>`<option>${o}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label class="fl">Internships Done</label><input class="fi" id="f-internships" placeholder="e.g. 1 internship at Wipro (2 months)"></div>
+      <div class="fg"><label class="fl">Certifications</label><input class="fi" id="f-certifications" placeholder="e.g. AWS Cloud, Google Analytics"></div>
+    </div>`
+  },
+  {
+    title:'Skills & Projects',
+    sub:'Technical skills, subjects you love, and what you have built',
+    content: `
+    <div class="sub-section">Technical Skills (select all that apply)</div>
+    <div class="tag-wrap" id="tg-skills">${['HTML/CSS','JavaScript','React','Vue.js','Python','Java','C/C++','SQL','MongoDB','Node.js','Express','Django','Flask','Machine Learning','Deep Learning','TensorFlow','DSA','AWS','Azure','Docker','Git','Android','Flutter','iOS / Swift','Kotlin','PHP','TypeScript','GraphQL'].map(o=>`<div class="tag" onclick="tog('skills','${o}',this)">${o}</div>`).join('')}</div>
+    <div class="section-divider"></div>
+    <div class="sub-section">Favourite Subjects</div>
+    <div class="tag-wrap" id="tg-subjects">${['Data Structures & Algorithms','Operating Systems','DBMS','Computer Networks','Machine Learning','Software Engineering','Web Development','Algorithms','Compiler Design','Discrete Maths','Theory of Computation'].map(o=>`<div class="tag" onclick="tog('subjects','${o}',this)">${o}</div>`).join('')}</div>
+    <div class="section-divider"></div>
+    <div class="fg"><label class="fl">Current / Past Projects</label><input class="fi" id="f-projects" placeholder="e.g. E-commerce site (React+Node), ML spam classifier, Android attendance app"></div>`
+  },
+  {
+    title:'Goals & Preferences',
+    sub:'Career aspirations, industry preference and budget',
+    content: `
+    <div class="form-row">
+      <div class="fg"><label class="fl">Dream Job *</label><input class="fi" id="f-dream" placeholder="e.g. Full Stack Developer at a product startup"></div>
+      <div class="fg"><label class="fl">Preferred Industry *</label>
+        <select class="fi" id="f-industry"><option value="">Select...</option>
+        ${['Product Companies (FAANG+)','Service Companies (TCS, Infosys, Wipro)','Early-stage Startups','Fintech (Razorpay, Paytm)','EdTech (BYJU\'S, Unacademy)','Healthcare Tech','Gaming / Metaverse','Research & Academia','Government / PSU (DRDO, ISRO)','Consulting'].map(o=>`<option>${o}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Learning Budget / Month</label>
+      <select class="fi" id="f-budget"><option value="">Select...</option>
+      ${['No budget (free resources only)','₹0–500/month','₹500–2000/month','₹2000–5000/month','Above ₹5000/month','No constraint'].map(o=>`<option>${o}</option>`).join('')}
+      </select>
+    </div>
+    <div class="section-divider"></div>
+    <div class="sub-section">Interests</div>
+    <div class="tag-wrap" id="tg-interests">${['Building products','Open source','Competitive programming','Freelancing','Research','Teaching / Mentoring','Entrepreneurship','UI/UX Design','Content creation','Gaming','Finance / Investing'].map(o=>`<div class="tag" onclick="tog('interests','${o}',this)">${o}</div>`).join('')}</div>`
+  }
+];
+
+/* ── toggle tag ── */
+function tog(field, val, el) {
+  if (!S.p[field]) S.p[field] = [];
+  const i = S.p[field].indexOf(val);
+  if (i > -1) { S.p[field].splice(i,1); el.classList.remove('sel'); }
+  else { S.p[field].push(val); el.classList.add('sel'); }
+}
+
+/* ── render step indicator ── */
+function renderInd() {
+  let h = '';
+  STEPS.forEach((s,i) => {
+    if (i>0) h += `<div class="sline ${i<=S.step?'done':''}"></div>`;
+    const c = i<S.step?'done':i===S.step?'active':'';
+    h += `<div class="sdot ${c}">${i<S.step?'<i class="ti ti-check" style="font-size:11px"></i>':i+1}</div>`;
+  });
+  document.getElementById('step-ind').innerHTML = h;
+}
+
+/* ── render onboard ── */
+function renderOB() {
+  renderInd();
+  const s = STEPS[S.step];
+  const isLast = S.step === STEPS.length-1;
+  document.getElementById('ob-body').innerHTML = `
+  <div class="ob-card">
+    <div class="ob-title">${s.title}</div>
+    <div class="ob-sub">${s.sub}</div>
+    ${s.content}
+    <div style="display:flex;justify-content:space-between;margin-top:22px">
+      ${S.step>0?`<button class="btn btn-ghost" onclick="prevS()"><i class="ti ti-arrow-left"></i>Back</button>`:'<div></div>'}
+      ${isLast
+        ?`<button class="btn btn-primary" onclick="generate()" id="gen-btn"><i class="ti ti-sparkles"></i>Generate My AI Profile</button>`
+        :`<button class="btn btn-primary" onclick="nextS()">Continue<i class="ti ti-arrow-right"></i></button>`}
+    </div>
+  </div>`;
+  // restore saved values
+  ['name','age','college','city','marks10','board10','year10','marks12','board12','stream12','cgpa','sem','backlog','internships','certifications','projects','dream','industry','budget'].forEach(k => {
+    const el = document.getElementById('f-'+k);
+    if (el && S.p[k]) el.value = S.p[k];
+  });
+  // restore tags
+  ['skills','subjects','interests'].forEach(field => {
+    document.querySelectorAll(`#tg-${field} .tag`).forEach(el => {
+      if ((S.p[field]||[]).includes(el.textContent)) el.classList.add('sel');
+    });
+  });
+}
+
+function saveS() {
+  ['name','age','college','city','marks10','board10','year10','marks12','board12','stream12','cgpa','sem','backlog','internships','certifications','projects','dream','industry','budget'].forEach(k => {
+    const el = document.getElementById('f-'+k);
+    if (el) S.p[k] = el.value;
+  });
+}
+function nextS(){saveS();if(S.step<STEPS.length-1){S.step++;renderOB();}}
+function prevS(){saveS();if(S.step>0){S.step--;renderOB();}}
+
+function generate() {
+  saveS();
+  const btn = document.getElementById('gen-btn');
+  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i>Analysing your profile...';
+  btn.disabled = true;
+  const n = S.p.name || 'Student';
+  document.getElementById('sb-av').textContent = n.slice(0,2).toUpperCase();
+  document.getElementById('sb-name').textContent = n;
+  document.getElementById('sb-role').textContent = S.p.branch || 'Engineering';
+  setTimeout(() => {
+    buildDNA(); buildCareer(); buildSim(); buildPlace(); buildPlan();
+    showPage('dna');
+  }, 2000);
+}
+
+/* ════════════════════════════════
+   DNA PAGE
+════════════════════════════════ */
+function buildDNA() {
+  const p = S.p;
+  const name = p.name || 'Student';
+  const cgpa = parseFloat(p.cgpa) || 7.5;
+  const m10 = parseFloat(p.marks10) || 80;
+  const m12 = parseFloat(p.marks12) || 80;
+  const skills = p.skills || [];
+
+  // scores
+  const careerR  = Math.min(95, Math.round(55 + cgpa*3 + skills.length*1.5));
+  const placeR   = Math.min(95, Math.round(50 + cgpa*3.5 + skills.length*1.8 + (p.internships?5:0)));
+  const skillIdx = Math.min(98, Math.round(45 + skills.length*4 + cgpa*1.5));
+  const acadIdx  = Math.min(98, Math.round((cgpa*10*0.5) + (m10*0.25) + (m12*0.25)));
+  const empScore = Math.min(95, Math.round(placeR*0.7 + skillIdx*0.3));
+
+  // student type
+  const typeMap = {'React':'Frontend Engineer','Python':'AI/ML Engineer','Machine Learning':'Data Scientist','Node.js':'Full Stack Developer','Java':'Backend Engineer','Android':'Mobile Developer','Flutter':'Mobile Developer','AWS':'Cloud Engineer','Docker':'DevOps Engineer'};
+  let sType = 'Future Tech Professional';
+  for (const [sk,ty] of Object.entries(typeMap)) if (skills.includes(sk)) { sType = ty; break; }
+
+  const strengths = skills.slice(0,3).length ? skills.slice(0,3) : ['Problem Solving','Analytical Thinking','Learning Agility'];
+  const weakPool = ['DSA','System Design','Communication','Leadership','Backend Dev','Cloud','Testing'];
+  const weaknesses = weakPool.filter(w => !skills.includes(w)).slice(0,3);
+
+  // academic trend
+  const trend = (m12 > m10) ? '📈 Improving' : (m12 < m10 ? '📉 Declining' : '➡ Stable');
+  const acad10color = m10>=85?'#10b981':m10>=70?'#f59e0b':'#ef4444';
+  const acad12color = m12>=85?'#10b981':m12>=70?'#f59e0b':'#ef4444';
+  const cgpaColor   = cgpa>=8?'#10b981':cgpa>=6.5?'#f59e0b':'#ef4444';
+
+  document.getElementById('dna-body').innerHTML = `
+<div class="dna-hero">
+  <div class="dna-eyebrow">Student DNA Profile ✦</div>
+  <div class="dna-name">${name}</div>
+  <div class="dna-sub">${p.branch||'Engineering'} · ${p.year||'Student'} · ${p.college||'College'}</div>
+  <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
+    <span class="badge b-purple"><i class="ti ti-user" style="font-size:10px"></i>${sType}</span>
+    <span class="badge b-cyan"><i class="ti ti-map-pin" style="font-size:10px"></i>${p.city||'India'}</span>
+    <span class="badge b-gold"><i class="ti ti-target" style="font-size:10px"></i>${p.industry||'Tech Industry'}</span>
+    ${p.internships?'<span class="badge b-green"><i class="ti ti-building" style="font-size:10px"></i>Has Internship</span>':''}
+    ${p.certifications?'<span class="badge b-pink"><i class="ti ti-certificate" style="font-size:10px"></i>Certified</span>':''}
+  </div>
+</div>
+
+<!-- Academic strip -->
+<div class="acad-strip mb20">
+  <div class="acad-box">
+    <div class="acad-box-label">10th Marks</div>
+    <div class="acad-box-val" style="color:${acad10color}">${p.marks10||'N/A'}</div>
+    <div class="t-xs t2 mt4">${p.board10||'Board'}</div>
+  </div>
+  <div class="acad-box">
+    <div class="acad-box-label">12th Marks</div>
+    <div class="acad-box-val" style="color:${acad12color}">${p.marks12||'N/A'}</div>
+    <div class="t-xs t2 mt4">${p.board12||'Board'} · ${p.stream12||'Stream'}</div>
+  </div>
+  <div class="acad-box">
+    <div class="acad-box-label">College CGPA</div>
+    <div class="acad-box-val" style="color:${cgpaColor}">${p.cgpa||'N/A'}</div>
+    <div class="t-xs t2 mt4">Academic Trend: ${trend}</div>
+  </div>
+</div>
+
+<!-- Score cards -->
+<div class="grid5 mb20">
+  ${[
+    {lbl:'Career Readiness',val:careerR,g:'#6366f1,#8b5cf6',cls:'m1'},
+    {lbl:'Placement Score',val:placeR,g:'#06b6d4,#0891b2',cls:'m2'},
+    {lbl:'Skill Strength',val:skillIdx,g:'#10b981,#059669',cls:'m3'},
+    {lbl:'Academic Index',val:acadIdx,g:'#f59e0b,#d97706',cls:'m4'},
+    {lbl:'Employability',val:empScore,g:'#ec4899,#db2777',cls:'m5'},
+  ].map(m=>`<div class="metric ${m.cls}">
+    <div class="metric-label">${m.lbl}</div>
+    <div class="metric-val" style="background:linear-gradient(135deg,${m.g});-webkit-background-clip:text;-webkit-text-fill-color:transparent">${m.val}%</div>
+    <div class="metric-bar"><div class="metric-fill" style="width:${m.val}%;background:linear-gradient(90deg,${m.g})"></div></div>
+  </div>`).join('')}
+</div>
+
+<div class="grid3">
+  <div class="card">
+    <div class="sec-lbl">Core Strengths</div>
+    ${strengths.map(s=>`<div class="ai-item" style="padding:9px 11px"><div class="ai-icon l" style="width:28px;height:28px;font-size:12px"><i class="ti ti-check"></i></div><div class="ai-title" style="font-size:12.5px">${s}</div></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="sec-lbl">Weak Areas (Focus Here)</div>
+    ${weaknesses.map(w=>`<div class="ai-item" style="padding:9px 11px"><div class="ai-icon h" style="width:28px;height:28px;font-size:12px"><i class="ti ti-alert-triangle"></i></div><div class="ai-title" style="font-size:12.5px">${w}</div></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="sec-lbl">Profile Summary</div>
+    <div class="card-inner mb8">
+      <div style="font-size:12px;font-weight:600;margin-bottom:3px">Learning Style</div>
+      <div class="t-sm t2">Visual + Project-based hands-on learning</div>
+    </div>
+    <div class="card-inner mb8">
+      <div style="font-size:12px;font-weight:600;margin-bottom:3px">Growth Potential</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#10b981">HIGH ↑</div>
+    </div>
+    <div class="card-inner">
+      <div style="font-size:12px;font-weight:600;margin-bottom:3px">Dream Goal</div>
+      <div class="t-sm t2">${p.dream||'Tech Career in India'}</div>
+    </div>
+  </div>
+</div>
+
+<div class="glow-divider"></div>
+<div class="ai-msg">
+  <p>Based on your profile, you're a strong <strong>${sType}</strong> candidate. Your ${strengths.slice(0,2).join(' & ')} skills stand out. Your academic journey shows a <strong>${trend.replace(/📈|📉|➡/g,'').trim()}</strong> trend from 10th to college. To reach ₹10–20 LPA, close the gap in <strong>${weaknesses[0]||'DSA'}</strong> and <strong>${weaknesses[1]||'System Design'}</strong>. You're approximately <strong>${Math.round((100-placeR)/5)*3} months</strong> away from placement-readiness.</p>
+</div>`;
+}
+
+/* ════════════════════════════════
+   CAREER PAGE
+════════════════════════════════ */
+function buildCareer() {
+  const p = S.p; const skills = p.skills||[]; const dream = (p.dream||'').toLowerCase();
+  const careers = [
+    {title:'Full Stack Developer',score:dream.includes('full')?96:skills.includes('React')?91:83,salary:'₹6–22 LPA',demand:94,comp:'High',skills:['React','Node.js','MongoDB','REST APIs'],growth:'Very High',diff:'Moderate'},
+    {title:'AI / ML Engineer',score:skills.includes('Machine Learning')||skills.includes('Python')?93:74,salary:'₹9–28 LPA',demand:97,comp:'Medium',skills:['Python','TensorFlow','Stats','SQL'],growth:'Exceptional',diff:'Hard'},
+    {title:'Product Engineer',score:dream.includes('product')?95:80,salary:'₹12–35 LPA',demand:90,comp:'Low-Med',skills:['System Design','APIs','Agile','DS&A'],growth:'Very High',diff:'Hard'},
+    {title:'Data Scientist',score:skills.includes('Python')?84:70,salary:'₹8–24 LPA',demand:91,comp:'Medium',skills:['Python','Stats','ML','Visualization'],growth:'High',diff:'Hard'},
+    {title:'DevOps / Cloud Eng.',score:skills.includes('Docker')||skills.includes('AWS')?85:62,salary:'₹7–20 LPA',demand:88,comp:'Low',skills:['Linux','Docker','Kubernetes','CI/CD'],growth:'High',diff:'Moderate'},
+    {title:'Android Developer',score:skills.includes('Android')||skills.includes('Flutter')?87:64,salary:'₹5–18 LPA',demand:82,comp:'High',skills:['Kotlin','Flutter','APIs','Firebase'],growth:'Moderate',diff:'Moderate'},
+  ].sort((a,b)=>b.score-a.score);
+  const top = careers[0];
+  const roadmap = [
+    {m:'Month 1',task:'Foundation',det:`${top.skills[0]||'Core concepts'} basics`},
+    {m:'Month 2',task:'Core Skills',det:`${top.skills[1]||'JavaScript'} deep dive`},
+    {m:'Month 3',task:'Framework',det:`${top.skills[2]||'Framework'} mastery`},
+    {m:'Month 4',task:'Projects',det:'Build 2 real projects'},
+    {m:'Month 5',task:'DSA',det:'LeetCode daily grind'},
+    {m:'Month 6',task:'Interviews',det:'Mock + system design'},
+    {m:'Month 7',task:'Internship',det:'Apply aggressively'},
+    {m:'Month 8',task:'Offer',det:'Convert to full-time'},
+  ];
+  document.getElementById('career-body').innerHTML = `
+<div class="grid2 mb16">
+  <div>
+    <div class="sec-lbl mb8">Top Career Matches</div>
+    ${careers.slice(0,5).map((c,i)=>`<div class="cc ${i===0?'top':''}">
+      <div class="cc-rank">${i+1}</div>
+      <div class="row mb4">
+        <div class="cc-title">${c.title}</div>
+        ${i===0?'<span class="badge b-gold" style="font-size:9.5px">Best Match</span>':''}
+      </div>
+      <div class="between">
+        <div class="cc-score">${c.score}%</div>
+        <div style="text-align:right"><div style="font-size:12px;font-weight:600;color:#10b981">${c.salary}</div><div class="t-xs t2">Demand ${c.demand}/100</div></div>
+      </div>
+      <div class="tag-wrap mt8">${c.skills.slice(0,3).map(s=>`<span class="tag" style="cursor:default">${s}</span>`).join('')}</div>
+    </div>`).join('')}
+  </div>
+  <div>
+    <div class="sec-lbl mb8">Deep Dive: ${top.title}</div>
+    <div class="card mb12">
+      ${[{l:'Salary Range',v:top.salary,c:'#10b981'},{l:'Market Demand',v:top.demand+'/100',c:'#a5b4fc'},{l:'Competition',v:top.comp,c:'#fcd34d'},{l:'Future Growth',v:top.growth,c:'#67e8f9'},{l:'Learning Difficulty',v:top.diff,c:'#f9a8d4'}].map(r=>`
+      <div class="between" style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div class="t-sm t2">${r.l}</div>
+        <div style="font-size:12.5px;font-weight:700;color:${r.c}">${r.v}</div>
+      </div>`).join('')}
+    </div>
+    <div class="card" style="background:linear-gradient(135deg,#0d0d20,#0a1428);border-color:#6366f125">
+      <div class="row mb12"><i class="ti ti-route" style="color:#a5b4fc;font-size:17px"></i><div style="font-size:13px;font-weight:600">8-Month AI Learning Roadmap</div></div>
+      <div class="rm-grid">${roadmap.map(r=>`<div class="rm-item"><div class="rm-mo">${r.m}</div><div class="rm-task">${r.task}</div><div class="rm-det">${r.det}</div></div>`).join('')}</div>
+    </div>
+  </div>
+</div>
+<div class="glow-divider"></div>
+<div class="ai-msg">
+  <p>Your best career match is <strong>${top.title}</strong> at <strong>${top.score}%</strong> compatibility. Market demand is very high — companies like <strong>Razorpay, Swiggy, CRED, Zomato</strong> and global giants are actively hiring. Starting salary: <strong>${top.salary}</strong>. Follow the 8-month roadmap above consistently to unlock top offers.</p>
+</div>`;
+}
+
+/* ════════════════════════════════
+   SIMULATOR
+════════════════════════════════ */
+let simSc = 0;
+const SCS = [
+  {label:'Current pace (2h/day)',mult:1,impact:'Standard growth path'},
+  {label:'Intensive (4h/day)',mult:1.18,impact:'+₹3–4 LPA boost early'},
+  {label:'Early internship 2025',mult:1.22,impact:'Senior role 1 yr sooner'},
+  {label:'Pursue Masters (2–3yr)',mult:0.88,impact:'Higher ceiling, slower start'},
+];
+function buildSim() {
+  const p = S.p; const name = p.name||'You'; const dream = p.dream||'Tech Engineer';
+  const ms = [
+    {yr:'2025',label:'Learn & Build',sal:'₹0 (Studying)',icon:'ti-books'},
+    {yr:'2026',label:'Internship',sal:'₹15K–30K/mo',icon:'ti-building'},
+    {yr:'2027',label:'First Job',sal:'₹6–12 LPA',icon:'ti-briefcase'},
+    {yr:'2028',label:'Mid-Level',sal:'₹14–20 LPA',icon:'ti-trending-up'},
+    {yr:'2030',label:'Senior Dev',sal:'₹22–38 LPA',icon:'ti-star'},
+    {yr:'2032',label:'Lead / Principal',sal:'₹45–90 LPA',icon:'ti-crown'},
+  ];
+  const mult = SCS[simSc].mult;
+  document.getElementById('sim-body').innerHTML = `
+<div class="sim-hero" style="position:relative">
+  <div style="position:relative;z-index:2">
+    <div style="font-size:10px;color:#67e8f9;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:8px">INTERACTIVE CAREER TIMELINE ✦</div>
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:3px">${name}'s Journey to</div>
+    <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,#a5b4fc,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">${dream}</div>
+    <div style="color:var(--text2);font-size:13px">Choose a scenario below to dynamically recalculate your future ↓</div>
+  </div>
+</div>
+<div class="sec-lbl mb8">What-If Scenarios</div>
+<div class="grid4 mb20">${SCS.map((s,i)=>`<div class="sc-card ${i===simSc?'active':''}" onclick="selSc(${i})"><div class="sc-title">${s.label}</div><div class="sc-impact">${s.impact}</div></div>`).join('')}</div>
+<div class="sec-lbl mb8">Timeline — <span style="color:#a5b4fc">${SCS[simSc].label}</span></div>
+<div class="sim-track mb20">${ms.map((m,i)=>`<div class="sn ${i<=1?'reached':''}${i===1?' current':''}">
+  <div class="sn-year">${m.yr}</div>
+  <i class="ti ${m.icon}" style="font-size:17px;color:${i<=1?'#a5b4fc':'var(--text3)'};margin:5px 0;display:block"></i>
+  <div class="sn-label">${m.label}</div>
+  <div class="sn-sal" style="color:${i<=1?'#10b981':'var(--text3)'}">${m.sal}</div>
+</div>`).join('')}</div>
+<div class="grid2">
+  <div class="card">
+    <div style="font-size:13px;font-weight:600;margin-bottom:14px">Salary Growth Projection</div>
+    <div style="height:190px;position:relative"><canvas id="salChart"></canvas></div>
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:600;margin-bottom:12px">Milestone Tracker</div>
+    <div class="tl">${ms.map((m,i)=>`<div class="tl-item">
+      <div class="tl-dot" style="background:${i<=1?'linear-gradient(135deg,#6366f1,#06b6d4)':'var(--bg5)'}"></div>
+      <div class="tl-year">${m.yr}</div>
+      <div class="tl-title">${m.label} — <span style="color:#10b981;font-size:11.5px">${m.sal}</span></div>
+    </div>`).join('')}</div>
+  </div>
+</div>
+<div class="glow-divider"></div>
+<div class="ai-msg">
+  <p>On <strong>${SCS[simSc].label}</strong>, you'll hit <strong>₹${Math.round(22*mult)}–${Math.round(38*mult)} LPA</strong> by 2030. Switching to intensive study reduces time-to-first-offer by ~4 months. The <strong>early internship</strong> scenario yields the highest ROI — a single 2-month internship can increase starting salary by 20–30%.</p>
+</div>`;
+  setTimeout(() => {
+    const labels = ['2025','2026','2027','2028','2029','2030','2032'];
+    const data = [0,2,8,14,20,30,58].map(v=>Math.round(v*mult));
+    new Chart(document.getElementById('salChart'),{
+      type:'line',
+      data:{labels,datasets:[{
+        label:'₹ LPA',data,
+        borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,0.08)',
+        fill:true,tension:.42,
+        pointBackgroundColor:'#6366f1',pointRadius:5,pointBorderColor:'#0f0f1a',pointBorderWidth:2
+      }]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'₹'+c.raw+'L'}}},scales:{y:{ticks:{color:'#505070',callback:v=>'₹'+v+'L'},grid:{color:'#ffffff08'}},x:{ticks:{color:'#505070'},grid:{color:'#ffffff08'}}}}
+    });
+  },120);
+}
+function selSc(i){simSc=i;buildSim();}
+
+/* ════════════════════════════════
+   PLACEMENT
+════════════════════════════════ */
+function buildPlace() {
+  const p = S.p; const cgpa=parseFloat(p.cgpa)||7.5; const skills=p.skills||[];
+  const m10=parseFloat(p.marks10)||80; const m12=parseFloat(p.marks12)||80;
+  const hasIntern = !!p.internships; const hasCert = !!p.certifications;
+  const overall = Math.min(95,Math.round(50+cgpa*2.5+skills.length*2+(hasIntern?7:0)+(hasCert?3:0)));
+  const tech    = Math.min(98,Math.round(45+skills.length*4+cgpa*1.8));
+  const proj    = Math.min(90,Math.round(35+(p.projects?18:0)+skills.length*2.5+(hasIntern?10:0)));
+  const resume  = Math.min(90,Math.round(55+cgpa*2.5+(hasCert?8:0)));
+  const comm    = 62;
+  const intv    = Math.min(85,Math.round(40+cgpa*3+(hasIntern?8:0)));
+  const acad    = Math.min(95,Math.round((cgpa*10*0.5)+(m10*0.25)+(m12*0.25)));
+  const startup = Math.min(92,Math.round(overall+6));
+  const service = Math.min(97,Math.round(overall+12));
+  const product = Math.min(84,Math.round(overall-4));
+  const cos = [
+    {name:'Amazon',type:'Product',match:Math.min(86,tech-6),col:'#FF9900',ic:'A'},
+    {name:'Microsoft',type:'Product',match:Math.min(83,tech-9),col:'#00A4EF',ic:'M'},
+    {name:'Razorpay',type:'Fintech',match:Math.min(89,tech+1),col:'#2EB5C9',ic:'R'},
+    {name:'Swiggy',type:'Startup',match:Math.min(87,tech),col:'#FC8019',ic:'S'},
+    {name:'Zomato',type:'Startup',match:Math.min(85,overall+4),col:'#E23744',ic:'Z'},
+    {name:'TCS',type:'Service',match:Math.min(96,service),col:'#6F2D7B',ic:'T'},
+    {name:'Infosys',type:'Service',match:Math.min(94,service-2),col:'#007CC3',ic:'I'},
+    {name:'Wipro',type:'Service',match:Math.min(92,service-4),col:'#341B68',ic:'W'},
+  ].sort((a,b)=>b.match-a.match);
+  const breakdown=[
+    {lbl:'Technical Skills',val:tech,col:'#6366f1'},
+    {lbl:'Projects & Portfolio',val:proj,col:'#06b6d4'},
+    {lbl:'Academic Record (10/12/CGPA)',val:acad,col:'#f59e0b'},
+    {lbl:'Resume Quality',val:resume,col:'#10b981'},
+    {lbl:'Communication Skills',val:comm,col:'#ec4899'},
+    {lbl:'Interview Readiness',val:intv,col:'#8b5cf6'},
+  ];
+  document.getElementById('place-body').innerHTML = `
+<div class="grid2 mb16">
+  <div class="card" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+    <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:700">Overall Placement Score</div>
+    <div class="big-score">${overall}</div>
+    <div class="t-sm t2">out of 100</div>
+    <span class="badge ${overall>=80?'b-green':overall>=60?'b-gold':'b-red'}" style="font-size:11px;padding:5px 14px">${overall>=80?'🎯 Job-Ready':overall>=60?'⚡ Developing':'🔧 Needs Work'}</span>
+    <div class="grid3" style="width:100%;gap:8px;margin-top:6px">
+      ${[{l:'Startup',v:startup,c:'#06b6d4'},{l:'Service',v:service,c:'#10b981'},{l:'Product',v:product,c:'#6366f1'}].map(x=>`
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:9px;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:${x.c}">${x.v}%</div>
+        <div class="t-xs t2">${x.l}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-lbl mb10">Score Breakdown (6 Dimensions)</div>
+    ${breakdown.map(b=>`<div class="prog-item">
+      <div class="prog-row"><div class="prog-label">${b.lbl}</div><div class="prog-pct">${b.val}%</div></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${b.val}%;background:${b.col}"></div></div>
+    </div>`).join('')}
+  </div>
+</div>
+<div class="grid2">
+  <div class="card">
+    <div class="sec-lbl mb10">Recommended Companies</div>
+    ${cos.slice(0,7).map(c=>`<div class="co-card">
+      <div class="co-logo" style="background:${c.col}20;color:${c.col}">${c.ic}</div>
+      <div><div class="co-name">${c.name}</div><div class="co-type">${c.type}</div></div>
+      <div class="co-pct" style="color:${c.match>=85?'#10b981':c.match>=70?'#f59e0b':'#a5b4fc'}">${c.match}%</div>
+    </div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="sec-lbl mb8">AI Recommendations</div>
+    <span class="badge b-red mb8" style="font-size:10px">🔴 High Priority</span>
+    ${['Practice DSA on LeetCode (45 min/day)','Complete 3 mock interviews this week','Build 1 more end-to-end project'].map(r=>`<div class="ai-item" style="padding:9px 11px;margin-bottom:5px">
+      <div class="ai-icon h" style="width:26px;height:26px;font-size:12px"><i class="ti ti-alert-triangle"></i></div>
+      <div class="ai-title" style="font-size:12px">${r}</div>
+    </div>`).join('')}
+    <span class="badge b-gold" style="font-size:10px;margin:10px 0 8px;display:inline-flex">🟡 Medium Priority</span>
+    ${['Optimise LinkedIn profile headline','Get AWS / GCP certification','Contribute to 1 open source repo'].map(r=>`<div class="ai-item" style="padding:9px 11px;margin-bottom:5px">
+      <div class="ai-icon m" style="width:26px;height:26px;font-size:12px"><i class="ti ti-flag"></i></div>
+      <div class="ai-title" style="font-size:12px">${r}</div>
+    </div>`).join('')}
+  </div>
+</div>
+<div class="glow-divider"></div>
+<div class="ai-msg">
+  <p>Your score of <strong>${overall}/100</strong> is ${overall>=80?'excellent — you are placement-ready for most companies':'promising but needs targeted improvement'}. Your academic record (10th: <strong>${S.p.marks10||'N/A'}</strong>, 12th: <strong>${S.p.marks12||'N/A'}</strong>, CGPA: <strong>${S.p.cgpa||'N/A'}</strong>) ${acad>=80?'is a strong foundation — many companies filter on this':'needs to be supplemented by strong project work'}. Closing the DSA and interview gap will push you past 90+.</p>
+</div>`;
+}
+
+/* ════════════════════════════════
+   ACTION PLAN
+════════════════════════════════ */
+function buildPlan() {
+  const p = S.p; const name=p.name||'Student'; const dream=p.dream||'Tech Developer'; const skills=p.skills||[];
+  const actions=[
+    {ic:'ti-code',t:'DSA Practice',d:'Solve 2 LeetCode problems daily. Focus: Arrays, Trees, DP, Graphs',pri:'h'},
+    {ic:'ti-device-laptop',t:'Build 3 Projects',d:'End-to-end projects: 1 web, 1 API, 1 that uses your top skill',pri:'h'},
+    {ic:'ti-users',t:'Mock Interviews',d:'2 mock interviews per week on Pramp, InterviewBit or with peers',pri:'h'},
+    {ic:'ti-brand-linkedin',t:'LinkedIn Strategy',d:'Post 3×/week, connect with 100 professionals, update headline',pri:'m'},
+    {ic:'ti-certificate',t:'Earn Certifications',d:'AWS Cloud Practitioner or Google Associate cert (2 months)',pri:'m'},
+    {ic:'ti-git-branch',t:'Open Source',d:'Contribute 1 PR/week to a popular GitHub repo in your domain',pri:'m'},
+    {ic:'ti-file-cv',t:'ATS Resume',d:'ATS-optimised resume, quantified achievements, reviewed by senior',pri:'l'},
+    {ic:'ti-school',t:'System Design',d:'Grokking System Design — 2 chapters/week, draw diagrams',pri:'l'},
+  ];
+  document.getElementById('plan-body').innerHTML = `
+<div class="dna-hero mb20">
+  <div class="dna-eyebrow">AI MASTER PLAN ✦</div>
+  <div style="font-size:17px;font-weight:700;margin-bottom:6px;font-family:'Syne',sans-serif">Final Verdict for ${name}</div>
+  <div style="font-size:14.5px;line-height:1.8;color:var(--text2)">
+    To become a <strong style="color:#a5b4fc">${dream}</strong> by 2028 — improve <strong style="color:#67e8f9">DSA</strong>, build <strong style="color:#6ee7b7">3 strong projects</strong>, complete <strong style="color:#fcd34d">1 internship</strong> and reach a <strong style="color:#f9a8d4">placement readiness score above 90</strong>.
+  </div>
+</div>
+<div class="grid2 mb16">
+  <div>
+    <div class="sec-lbl mb8">90-Day Sprint Plan</div>
+    ${actions.map(a=>`<div class="ai-item">
+      <div class="ai-icon ${a.pri}" style="width:34px;height:34px"><i class="ti ${a.ic}"></i></div>
+      <div style="flex:1"><div class="ai-title">${a.t}</div><div class="ai-desc">${a.d}</div></div>
+      <span class="pri ${a.pri}">${a.pri==='h'?'HIGH':a.pri==='m'?'MED':'LOW'}</span>
+    </div>`).join('')}
+  </div>
+  <div>
+    <div class="sec-lbl mb8">Weekly Schedule</div>
+    <div class="card mb12">${[
+      {day:'Mon–Fri',task:'DSA (45min) + 1 concept video',col:'#a5b4fc'},
+      {day:'Saturday',task:'Project building (4 hrs)',col:'#67e8f9'},
+      {day:'Sunday',task:'Mock interview + reflection',col:'#6ee7b7'},
+      {day:'Daily',task:'LinkedIn post or engagement',col:'#fcd34d'},
+    ].map(d=>`<div class="between" style="padding:9px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:12px;font-weight:700;color:${d.col}">${d.day}</div>
+      <div class="t-sm t2">${d.task}</div>
+    </div>`).join('')}</div>
+    <div class="sec-lbl mb8">Top Free Resources</div>
+    <div class="card">${[
+      {n:'LeetCode',c:'DSA Practice',free:true},
+      {n:'The Odin Project',c:'Full Stack Dev',free:true},
+      {n:'Neetcode.io',c:'DSA Roadmap',free:true},
+      {n:'CS50 Harvard',c:'CS Fundamentals',free:true},
+      {n:'Pramp',c:'Mock Interviews',free:true},
+      {n:'Coursera (ML)',c:'Machine Learning',free:false},
+    ].map(r=>`<div class="between" style="padding:7px 0;border-bottom:1px solid var(--border)">
+      <div><div style="font-size:12.5px;font-weight:500">${r.n}</div><div class="t-xs t2">${r.c}</div></div>
+      <span class="badge ${r.free?'b-green':'b-purple'}" style="font-size:9.5px">${r.free?'Free':'Paid'}</span>
+    </div>`).join('')}</div>
+  </div>
+</div>
+<div style="background:linear-gradient(135deg,#0a0a18,#0a1428);border:1px solid #6366f135;border-radius:var(--radius2);padding:22px;text-align:center;box-shadow:var(--glow)">
+  <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:#a5b4fc;letter-spacing:1.2px;margin-bottom:12px">✦ MESSAGE FROM YOUR AI MENTOR ✦</div>
+  <div style="font-size:15px;line-height:1.85;color:var(--text);max-width:580px;margin:0 auto">"${name}, your profile shows <strong>${(skills||[]).slice(0,2).join(' & ')||'real potential'}</strong>. The gap between where you are and where you want to be is not talent — it's <strong>consistent daily action</strong>. Show up every day, build in public, and 2027 will be your year."</div>
+  <div style="margin-top:18px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+    <button class="btn btn-primary" onclick="showPage('simulator')"><i class="ti ti-rocket"></i>Simulate My Future</button>
+    <button class="btn btn-ghost" onclick="showPage('placement')"><i class="ti ti-chart-bar"></i>Check Readiness</button>
+  </div>
+</div>`;
+}
+
+/* ── navigation ── */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const m={onboard:0,dna:1,career:2,simulator:3,placement:4,plan:5};
+  const items=document.querySelectorAll('.nav-item');
+  if(m[id]!==undefined&&items[m[id]])items[m[id]].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ── init ── */
+renderOB();
+</script>
+</body>
+</html>
